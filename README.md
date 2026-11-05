@@ -198,3 +198,4 @@ Use PostgreSQL (set `DATABASE_URL`, `pip install dj-database-url`), run
 `python manage.py collectstatic`, serve behind HTTPS. With DEBUG off the faucet
 is gone and secure-cookie / HSTS settings switch on automatically.
 # vyrobot-project
+# vyrobot-project
