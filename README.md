@@ -199,3 +199,4 @@ Use PostgreSQL (set `DATABASE_URL`, `pip install dj-database-url`), run
 is gone and secure-cookie / HSTS settings switch on automatically.
 # vyrobot-project
 # vyrobot-project
+# vyrobot-project
