@@ -1,0 +1,25 @@
+{% extends "admin/base.html" %}
+{% load i18n %}
+
+{% block title %}{{ title }} | {{ site_title|default:_('Django site admin') }}{% endblock %}
+
+{% block branding %}
+<div id="site-name"><a href="{% url 'admin:index' %}">{{ site_header|default:_('Django administration') }}</a></div>
+{% if user.is_anonymous %}{% include "admin/color_theme_toggle.html" %}{% endif %}
+{% endblock %}
+
+{% block nav-global %}{% endblock %}
+
+{% block extrastyle %}{{ block.super }}
+<style>
+  /* Make wide admin tables scroll instead of overflowing on phones/tablets */
+  #changelist .results { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  @media (max-width: 767px) {
+    #changelist .results table { min-width: 560px; }
+    #content { padding: 10px 12px; }
+    .module table { font-size: 13px; }
+    form .form-row { padding: 8px 10px; }
+    #content h1 { font-size: 18px; }
+  }
+</style>
+{% endblock %}

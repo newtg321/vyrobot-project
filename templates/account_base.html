@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vyrobot - {% block title %}Account{% endblock %}</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Poppins", sans-serif; }
+        body { background: #e4e5ea; color: #0a0f2c; padding: 20px; }
+        .wrap { max-width: 640px; margin: 0 auto; }
+        .top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px; }
+        .top .brand { color: #082795; font-weight: 700; font-size: 16px; }
+        .top a { color: #082795; text-decoration: none; font-weight: 600; font-size: 14px; }
+        .card { background: #fff; border-radius: 16px; padding: 22px; box-shadow: 0 4px 18px rgba(8,39,149,0.08); margin-bottom: 16px; }
+        h1 { font-size: 20px; color: #082795; margin-bottom: 4px; }
+        .sub { color: #6b7280; font-size: 13px; margin-bottom: 16px; }
+        label { display: block; font-size: 13px; color: #334; margin: 10px 0 4px; font-weight: 600; }
+        input, textarea { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #ccc; font-size: 14px; outline: none; }
+        input:focus, textarea:focus { border-color: #1d4ed8; }
+        .btn { background: #1d4ed8; color: #fff; border: none; padding: 11px 18px; border-radius: 10px; font-weight: 700; font-size: 14px; cursor: pointer; margin-top: 14px; }
+        .btn:hover { background: #1e40af; }
+        .msg { padding: 10px 14px; border-radius: 10px; font-size: 14px; margin-bottom: 12px; }
+        .msg.success { background: #e2f6e4; color: #1c6a2a; }
+        .msg.error { background: #fde2e2; color: #8a1c1c; }
+        .msg.info, .msg.warning { background: #e6ecff; color: #0f2593; }
+        .errlist { color: #8a1c1c; font-size: 12px; margin-top: 4px; }
+        .qa { margin-bottom: 14px; }
+        .qa h3 { font-size: 14px; color: #0a0f2c; margin-bottom: 4px; }
+        .qa p { font-size: 13px; color: #475569; line-height: 1.5; }
+    </style>
+</head>
+<body>
+    <div class="wrap">
+        <div class="top">
+            <span class="brand">Vyrobot</span>
+            <a href="{% url 'dashboard' %}">← Back to dashboard</a>
+        </div>
+        {% if messages %}
+            {% for m in messages %}<div class="msg {{ m.tags }}">{{ m }}</div>{% endfor %}
+        {% endif %}
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>

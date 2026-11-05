@@ -1,0 +1,16 @@
+{% extends "account_base.html" %}
+{% block title %}Support{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>Support</h1>
+    <p class="sub">Send us a message and the team will get back to you.</p>
+    <form method="post" action="{% url 'support' %}">
+        {% csrf_token %}
+        <label>Subject</label>
+        <input type="text" name="subject" maxlength="150" required>
+        <label>Message</label>
+        <textarea name="body" rows="5" required></textarea>
+        <button class="btn" type="submit">Send message</button>
+    </form>
+</div>
+{% endblock %}

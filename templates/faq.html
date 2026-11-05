@@ -1,0 +1,33 @@
+{% extends "account_base.html" %}
+{% block title %}FAQ{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>Frequently asked questions</h1>
+    <p class="sub">The basics of using your account.</p>
+
+    <div class="qa">
+        <h3>How do I add funds?</h3>
+        <p>Use the Credit or Add Fund button on your dashboard. You'll be taken to the payment gateway to pay, and your balance is credited once the payment is confirmed.</p>
+    </div>
+    <div class="qa">
+        <h3>How does staking work?</h3>
+        <p>Choose an amount and a lock period (14, 21 or 28 days). Your funds are locked for that period. Staking more adds to your stake and shifts the unlock date to the newest period.</p>
+    </div>
+    <div class="qa">
+        <h3>When can I unstake or claim my reward?</h3>
+        <p>After the lock period completes. Before that, Unstake and Claim are not available — you would need to use Emergency Withdraw to exit early, which carries a penalty.</p>
+    </div>
+    <div class="qa">
+        <h3>What is Emergency Withdraw?</h3>
+        <p>It lets you exit a locked stake early. You receive part of your staked amount back and forfeit the rest and any pending reward. The exact figures are shown before you confirm.</p>
+    </div>
+    <div class="qa">
+        <h3>How do I withdraw?</h3>
+        <p>Use the Withdraw box, choose a network, and paste your wallet address. Your balance is debited and the payout is processed once approved.</p>
+    </div>
+    <div class="qa">
+        <h3>Need more help?</h3>
+        <p>Open the Support page from the menu and send us a message.</p>
+    </div>
+</div>
+{% endblock %}

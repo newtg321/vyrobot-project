@@ -1,0 +1,20 @@
+{% extends "account_base.html" %}
+{% block title %}Profile{% endblock %}
+{% block content %}
+<div class="card">
+    <h1>Profile</h1>
+    <p class="sub">Your account details.</p>
+    <form method="post" action="{% url 'profile' %}">
+        {% csrf_token %}
+        <label>Username</label>
+        <input type="text" value="{{ u.username }}" disabled>
+        <label>First name</label>
+        <input type="text" name="first_name" value="{{ u.first_name }}">
+        <label>Last name</label>
+        <input type="text" name="last_name" value="{{ u.last_name }}">
+        <label>Email</label>
+        <input type="email" name="email" value="{{ u.email }}">
+        <button class="btn" type="submit">Save changes</button>
+    </form>
+</div>
+{% endblock %}

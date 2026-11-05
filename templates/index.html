@@ -1,0 +1,240 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VyRobot – Smarter Prediction Market Trading</title>
+  <meta name="description" content="Stake, earn and trade prediction markets with VyRobot. Transparent rewards, flexible lock periods.">
+  <link rel="icon" type="image/png" href="{% static 'vyrobot-logo.png' %}">
+  <link rel="stylesheet" href="{% static 'css2.css' %}">
+  <link rel="stylesheet" href="{% static 'landing.css' %}">
+</head>
+<body>
+
+<!-- NAV -->
+<header class="nav" id="nav">
+  <div class="bar">
+    <a href="{% url 'home' %}" class="logo"><img src="{% static 'vyrobot-logo.png' %}" alt="VyRobot"></a>
+    <ul>
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#markets">Markets</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#plans">Lock periods</a></li>
+      <li><a href="{% url 'faq' %}">FAQ</a></li>
+      <li><a href="{% url 'support' %}">Support</a></li>
+    </ul>
+    <div class="cta">
+      {% if user.is_authenticated %}
+        <a href="{% url 'dashboard' %}" class="btn btn-primary sm">Dashboard</a>
+      {% else %}
+        <a href="{% url 'auth' %}" class="btn btn-line sm">Sign in</a>
+        <a href="{% url 'auth' %}?tab=signup" class="btn btn-primary sm">Get started</a>
+      {% endif %}
+      <button class="burger" id="burger" aria-label="Menu">☰</button>
+    </div>
+  </div>
+  <nav class="mobile" id="mobile">
+    <a href="#how">How it works</a><a href="#markets">Markets</a><a href="#features">Features</a><a href="#plans">Lock periods</a>
+    <a href="{% url 'faq' %}">FAQ</a><a href="{% url 'support' %}">Support</a>
+    {% if not user.is_authenticated %}<a href="{% url 'auth' %}">Sign in</a>{% endif %}
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="grid-bg"></div><div class="blob a"></div><div class="blob b"></div>
+  <div class="wrap">
+    <div>
+      <span class="pill"><span class="live"><i></i> Live</span> Live on Polymarket &amp; Kalshi</span>
+      <h1>Trade prediction markets <span class="grad">the smarter way.</span></h1>
+      <p class="lead">Stake your balance, earn a clearly disclosed reward rate, and let VyRobot track the markets that matter — from the World Cup to crypto and politics.</p>
+      <div class="actions">
+        {% if user.is_authenticated %}
+          <a href="{% url 'dashboard' %}" class="btn btn-primary">Open dashboard →</a>
+        {% else %}
+          <a href="{% url 'auth' %}?tab=signup" class="btn btn-primary">Create free account →</a>
+          <a href="{% url 'auth' %}" class="btn btn-line">Sign in</a>
+        {% endif %}
+      </div>
+      <div class="trust">
+        <div class="logos">
+          <img src="{% static 'polymarket-logo.png' %}" alt="Polymarket">
+          <img src="{% static 'kalshi-logo.png' %}" alt="Kalshi">
+        </div>
+        <span>Built around the leading prediction markets</span>
+      </div>
+    </div>
+
+    <div class="visual">
+      <div class="card v-main">
+        <div class="v-top"><h4>Staking overview</h4><span class="tag">● Active</span></div>
+        <div class="apr">{{ apr_pct|floatformat:"-1" }}% <small>APR</small></div>
+        <div class="v-sub">Disclosed rate · accrues on staked principal</div>
+        <div class="chart">
+          <i style="height:28%"></i><i style="height:42%;animation-delay:.05s"></i><i style="height:36%;animation-delay:.1s"></i><i style="height:58%;animation-delay:.15s"></i>
+          <i style="height:50%;animation-delay:.2s"></i><i style="height:72%;animation-delay:.25s"></i><i style="height:66%;animation-delay:.3s"></i><i style="height:94%;animation-delay:.35s"></i>
+        </div>
+        <div class="v-row"><span>Lock periods</span><b>{% for d in stake_days %}{{ d }}{% if not forloop.last %} / {% endif %}{% endfor %} days</b></div>
+        <div class="v-row"><span>Deposits</span><b>● Crypto supported</b></div>
+        <div class="v-row"><span>Withdrawals</span><b>Request anytime</b></div>
+      </div>
+      <div class="card float f1"><img src="{% static 'tiny-2.png' %}" alt="FIFA World Cup"><div><b>FIFA World Cup</b><small>Trending market</small></div></div>
+      <div class="card float f2"><img src="{% static 'marketlogo_crypto-1783841335550.webp' %}" alt="Crypto"><div><b>Crypto</b><small>Markets tracked</small></div></div>
+      <div class="card float f3"><img src="{% static 'polymarket-logo.png' %}" alt="Polymarket"><img src="{% static 'kalshi-logo.png' %}" alt="Kalshi"></div>
+    </div>
+  </div>
+</section>
+
+<!-- LEAGUE MARQUEE -->
+<div class="marquee">
+  <p>Follow markets across the biggest leagues</p>
+  <div class="track">
+    {% for i in "12" %}
+    <div><img src="{% static 'tiny-2.png' %}" alt="">World Cup</div>
+    <div><img src="{% static 'tiny-3.png' %}" alt="">Premier League</div>
+    <div><img src="{% static 'tiny-4.png' %}" alt="">La Liga</div>
+    <div><img src="{% static 'tiny-1.png' %}" alt="">Serie A</div>
+    <div><img src="{% static 'tiny-6.png' %}" alt="">Bundesliga</div>
+    <div><img src="{% static 'tiny-7.png' %}" alt="">NBA</div>
+    <div><img src="{% static 'tiny-5.png' %}" alt="">NFL</div>
+    <div><img src="{% static 'tiny.png' %}" alt="">NHL</div>
+    {% endfor %}
+  </div>
+</div>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="wrap grid">
+    <div class="stat rv"><b>{{ apr_pct|floatformat:"-1" }}%</b><span>Disclosed APR</span></div>
+    <div class="stat rv d1"><b>{{ stake_days|length }}</b><span>Flexible lock periods</span></div>
+    <div class="stat rv d2"><b>2</b><span>Top prediction markets</span></div>
+    <div class="stat rv d3"><b>24/7</b><span>Account access</span></div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section id="how">
+  <div class="wrap center">
+    <span class="eyebrow rv">How it works</span>
+    <h2 class="rv">Up and running in three steps</h2>
+    <p class="sub rv">No complicated setup. Create an account, fund it, and start staking.</p>
+    <div class="steps">
+      <div class="step rv"><div class="num">1</div><h3>Create your account</h3><p>Sign up in under a minute with your email and a secure password.</p></div>
+      <div class="step rv d1"><div class="num">2</div><h3>Fund your wallet</h3><p>Add funds with supported crypto. Balances only change when real money moves.</p></div>
+      <div class="step rv d2"><div class="num">3</div><h3>Stake &amp; earn</h3><p>Choose a lock period, watch rewards accrue, then claim or recompound.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- MARKETS -->
+<section class="mk" id="markets">
+  <div class="wrap center">
+    <span class="eyebrow rv">Markets</span>
+    <h2 class="rv">Built around the world’s biggest markets</h2>
+    <p class="sub rv">Track what the crowd is predicting across every category.</p>
+    <div class="mk-grid">
+      <div class="mk-card rv"><img src="{% static 'marketlogo_politics-logo-1784064982908.webp' %}" alt="Politics"><div class="t"><b>Politics</b><span>Elections &amp; policy</span></div></div>
+      <div class="mk-card rv d1"><img src="{% static 'marketlogo_finance-1783841321092.webp' %}" alt="Finance"><div class="t"><b>Finance</b><span>Rates, stocks &amp; economy</span></div></div>
+      <div class="mk-card rv d2"><img src="{% static 'marketlogo_geopolitics-1783841330346.webp' %}" alt="Geopolitics"><div class="t"><b>Geopolitics</b><span>World events</span></div></div>
+      <div class="mk-card btc rv d3"><img src="{% static 'marketlogo_crypto-1783841335550.webp' %}" alt="Crypto"><div class="t"><b>Crypto</b><span>Bitcoin &amp; beyond</span></div></div>
+    </div>
+    <div class="leagues rv">
+      <span><img src="{% static 'tiny-2.png' %}" alt="">World Cup</span>
+      <span><img src="{% static 'tiny-3.png' %}" alt="">Premier League</span>
+      <span><img src="{% static 'tiny-4.png' %}" alt="">La Liga</span>
+      <span><img src="{% static 'tiny-1.png' %}" alt="">Serie A</span>
+      <span><img src="{% static 'tiny-6.png' %}" alt="">Bundesliga</span>
+      <span><img src="{% static 'tiny-7.png' %}" alt="">NBA</span>
+      <span><img src="{% static 'tiny-5.png' %}" alt="">NFL</span>
+      <span><img src="{% static 'tiny.png' %}" alt="">NHL</span>
+    </div>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="wrap center">
+    <span class="eyebrow rv">Features</span>
+    <h2 class="rv">Everything you need, nothing you don’t</h2>
+    <p class="sub rv">A clean dashboard built for clarity and control.</p>
+    <div class="bento">
+      <div class="bx w4 dark rv"><div class="ico">📈</div><h3>Prediction market focus</h3><p>Follow sports, politics, finance, crypto and geopolitics markets in one place.</p></div>
+      <div class="bx w2 rv d1"><div class="ico">🔒</div><h3>Transparent ledger</h3><p>Every deposit, stake, claim and withdrawal is recorded and visible in your history.</p></div>
+      <div class="bx w2 rv"><div class="ico">⚡</div><h3>Recompound in a click</h3><p>Roll your rewards back into your stake and keep your lock period going.</p></div>
+      <div class="bx w2 rv d1"><div class="ico">💳</div><h3>Crypto deposits</h3><p>Fund your account through our payment gateway with automatic confirmation.</p></div>
+      <div class="bx w2 rv d2"><div class="ico">🛡️</div><h3>Secure by design</h3><p>Hashed passwords, CSRF protection and a server-side balance you can trust.</p></div>
+      <div class="bx w3 dark rv"><div class="ico">💬</div><h3>Real support</h3><p>Questions? Reach our team from the support page and get a real answer.</p></div>
+      <div class="bx w3 rv d1"><div class="ico">🌍</div><h3>24/7 account access</h3><p>Check your balance, rewards and history anytime, from any device.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- LOCK PERIODS -->
+<section class="lk" id="plans">
+  <div class="wrap center">
+    <span class="eyebrow rv">Lock periods</span>
+    <h2 class="rv">Pick the period that fits you</h2>
+    <p class="sub rv">Same disclosed rate, your choice of how long to lock.</p>
+    <div class="locks">
+      {% for d in stake_days %}
+      <div class="lock {% if forloop.counter == 2 %}hot{% endif %} rv d{{ forloop.counter }}">
+        {% if forloop.counter == 2 %}<span class="badge">Most popular</span>{% endif %}
+        <h3>Lock</h3>
+        <div class="d">{{ d }}<small> days</small></div>
+        <div class="rate">{{ apr_pct|floatformat:"-1" }}% APR</div>
+        <ul><li>{{ apr_pct|floatformat:"-1" }}% APR on staked principal</li><li>Claim or recompound rewards</li><li>Full history in your dashboard</li></ul>
+        <a href="{% if user.is_authenticated %}{% url 'dashboard' %}{% else %}{% url 'auth' %}?tab=signup{% endif %}" class="btn {% if forloop.counter == 2 %}btn-white{% else %}btn-primary{% endif %}">Start staking</a>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+
+<!-- PLATFORMS -->
+<section class="pf">
+  <div class="wrap">
+    <div class="pf-box">
+      <div class="pf-card rv"><img src="{% static 'polymarket-logo.png' %}" alt="Polymarket"><div><h3>Polymarket</h3><p>One of the world’s largest prediction markets.</p></div></div>
+      <div class="pf-card rv d1"><img src="{% static 'kalshi-logo.png' %}" alt="Kalshi"><div><h3>Kalshi</h3><p>A regulated exchange for event contracts.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-sec">
+  <div class="wrap">
+    <div class="cta-box rv">
+      <h2>Ready to start with VyRobot?</h2>
+      <p>Create your free account today and explore the dashboard.</p>
+      {% if user.is_authenticated %}
+        <a href="{% url 'dashboard' %}" class="btn btn-white">Go to dashboard →</a>
+      {% else %}
+        <a href="{% url 'auth' %}?tab=signup" class="btn btn-white">Create free account →</a>
+        <a href="{% url 'auth' %}" class="btn btn-ghost" style="margin-left:10px">Sign in</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="f-top">
+      <img src="{% static 'vyrobot-logo.png' %}" alt="VyRobot">
+      <div class="f-links"><a href="{% url 'faq' %}">FAQ</a><a href="{% url 'support' %}">Support</a><a href="{% url 'auth' %}">Sign in</a></div>
+    </div>
+    <p class="risk"><b>Risk notice:</b> staking and prediction-market activity involve risk, including loss of funds. Rewards are subject to availability and the terms shown in your dashboard. Past performance does not guarantee future results. Only use funds you can afford to lose.</p>
+    <p class="copy">© {% now "Y" %} VyRobot. All rights reserved.</p>
+  </div>
+</footer>
+
+<script>
+const nav=document.getElementById('nav');
+addEventListener('scroll',()=>nav.classList.toggle('scrolled',scrollY>20));
+document.getElementById('burger').onclick=()=>document.getElementById('mobile').classList.toggle('open');
+document.querySelectorAll('#mobile a').forEach(a=>a.onclick=()=>document.getElementById('mobile').classList.remove('open'));
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+</script>
+</body>
+</html>

